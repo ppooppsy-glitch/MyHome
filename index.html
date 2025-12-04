@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!-- 뷰포트 설정: 모바일 반응형 필수 태그 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anne's Log | Tech & Design</title>
+    
+    <!-- 아이콘 사용을 위한 FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 폰트 설정 (Inter: 구글 폰트) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- 
+      [STYLE.CSS 영역] 
+      별도의 파일로 분리 시 style.css에 해당합니다.
+    -->
+    <style>
+        /* --- CSS Variables: 테마 색상 정의 --- */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --text-secondary: #6b7280;
+            --primary-color: #3b82f6;
+            --accent-color: #6366f1;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --border-color: #e5e7eb;
+            --nav-height: 70px;
+        }
+
+        /* 다크 모드 변수 재정의 */
+        [data-theme="dark"] {
+            --bg-color: #111827;
+            --text-color: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary-color: #60a5fa;
+            --card-bg: #1f2937;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --border-color: #374151;
+        }
+
+        /* --- 초기화 및 기본 스타일 --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease; /* 부드러운 테마 전환 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        /* --- 헤더 (Header) --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background-color: rgba(var(--bg-color), 0.8); /* 반투명 효과 */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        /* GNB (Global Navigation Bar) */
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links li a {
+            font-weight: 500;
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        .nav-links li a:hover, .nav-links li a.active {
+            color: var(--primary-color);
+        }
+        
+        /* 활성화된 메뉴 밑줄 효과 */
+        .nav-links li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+        
+        .nav-links li a:hover::after, .nav-links li a.active::after {
+            width: 100%;
+        }
+
+        /* 헤더 우측 컨트롤 (다크모드, 모바일 메뉴) */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        .mobile-menu-btn {
+            display: none; /* 데스크톱에서는 숨김 */
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* --- 메인 컨텐츠 영역 (SPA Sections) --- */
+        main {
+            margin-top: var(--nav-height);
+            min-height: calc(100vh - var(--nav-height) - 100px); /* 푸터 높이 고려 */
+            padding: 2rem 5%;
+        }
+
+        /* 섹션 숨김/표시 처리 (SPA 효과) */
+        section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- 1. 홈 섹션 (Featured Post) --- */
+        .hero {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin-bottom: 4rem;
+            padding: 2rem 0;
+        }
+
+        .hero-image {
+            flex: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-desc {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            border-radius: 8px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.8; }
+
+        /* --- 2. 그리드 레이아웃 (Tech & Design 공통) --- */
+        .section-header {
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 기본 3열 */
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .card-excerpt {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* 3줄 이상 말줄임 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* --- 3. 소개 (About) --- */
+        .about-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+        }
+
+        .about-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .about-links a {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+        .about-links a:hover { color: var(--primary-color); }
+
+        /* --- 푸터 (Footer) --- */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 5%;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: auto; /* 하단 고정 효과 */
+        }
+
+        /* --- 미디어 쿼리 (반응형 Breakpoints) --- */
+        
+        /* 태블릿 (Tablet): 768px 이하 */
+        @media (max-width: 900px) {
+            .hero {
+                flex-direction: column;
+            }
+            .hero-image {
+                width: 100%;
+            }
+            .post-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2열 변경 */
+            }
+        }
+
+        /* 모바일 (Mobile): 600px 이하 */
+        @media (max-width: 600px) {
+            .nav-links {
+                display: none; /* 기본 메뉴 숨김 */
+                position: absolute;
+                top: var(--nav-height);
+                left: 0;
+                width: 100%;
+                background-color: var(--bg-color);
+                flex-direction: column;
+                padding: 2rem;
+                border-bottom: 1px solid var(--border-color);
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .nav-links.active {
+                display: flex; /* 토글 시 보임 */
+            }
+
+            .mobile-menu-btn {
+                display: block; /* 햄버거 버튼 표시 */
+            }
+
+            .post-grid {
+                grid-template-columns: 1fr; /* 1열 변경 */
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 헤더 영역 -->
+    <header>
+        <a href="#home" class="logo" onclick="navigateTo('home')">Anne's Log.</a>
+        
+        <!-- 내비게이션 -->
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home" class="nav-item active" onclick="navigateTo('home')">Home</a></li>
+            <li><a href="#tech" class="nav-item" onclick="navigateTo('tech')">Tech</a></li>
+            <li><a href="#design" class="nav-item" onclick="navigateTo('design')">Design</a></li>
+            <li><a href="#about" class="nav-item" onclick="navigateTo('about')">About</a></li>
+        </ul>
+
+        <div class="header-controls">
+            <!-- 다크모드 토글 -->
+            <div class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </div>
+            <!-- 모바일 햄버거 메뉴 -->
+            <div class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 (SPA 구조) -->
+    <main>
+        <!-- 1. HOME Section -->
+        <section id="home" class="active">
+            <div class="hero">
+                <div class="hero-image">
+                    <!-- 랜덤 이미지 적용 (picsum.photos) -->
+                    <img src="https://picsum.photos/600/400?random=1" alt="Featured Post">
+                </div>
+                <div class="hero-content">
+                    <span class="badge">Featured Post</span>
+                    <h1 class="hero-title">정적 웹사이트 호스팅을 위한<br>Github Pages 완벽 가이드</h1>
+                    <p class="hero-desc">복잡한 서버 설정 없이 HTML 파일 하나로 전 세계에 나만의 웹사이트를 배포하는 방법을 알아봅니다.</p>
+                    <a href="#" class="btn" onclick="navigateTo('tech')">Read More</a>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2 class="section-title">Latest Updates</h2>
+            </div>
+            <!-- 미리보기용 그리드 (Home에는 3개만 노출) -->
+            <div class="post-grid">
+                <!-- Post 1 -->
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=2" class="card-image" alt="Post">
+                    <div class="card-body">
+                        <div class="card-date">2023. 10. 24</div>
+                        <h3 class="card-title">React vs Vue: 2024 트렌드 분석</h3>
+                        <p class="card-excerpt">프론트엔드 프레임워크의 양대 산맥인 React와 Vue의 생태계 변화와 선택 기준에 대해 심도 있게 다룹니다.</p>
+                    </div>
+                </article>
+                <!-- Post 2 -->
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=3" class="card-image" alt="Post">
+                    <div class="card-body">
+                        <div class="card-date">2023. 10. 20</div>
+                        <h3 class="card-title">미니멀리즘 웹 디자인의 정석</h3>
+                        <p class="card-excerpt">복잡함을 덜어내고 본질에 집중하는 미니멀리즘 디자인. 여백의 미와 타이포그래피 활용법을 소개합니다.</p>
+                    </div>
+                </article>
+                <!-- Post 3 -->
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=4" class="card-image" alt="Post">
+                    <div class="card-body">
+                        <div class="card-date">2023. 10. 15</div>
+                        <h3 class="card-title">CSS Grid 완벽 정복하기</h3>
+                        <p class="card-excerpt">Flexbox로 해결하기 힘든 2차원 레이아웃, Grid 시스템을 사용하여 복잡한 레이아웃을 손쉽게 구현해봅시다.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 2. TECH Section -->
+        <section id="tech">
+            <div class="section-header">
+                <h2 class="section-title">Tech Log</h2>
+                <p style="color:var(--text-secondary)">개발, 코딩, 그리고 새로운 기술에 대한 이야기</p>
+            </div>
+            <div class="post-grid">
+                <!-- 6개의 포스트 카드 -->
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=5" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 11. 01</div>
+                        <h3 class="card-title">ES6+ 핵심 문법 정리</h3>
+                        <p class="card-excerpt">모던 자바스크립트 개발을 위해 반드시 알아야 할 구조 분해 할당, 화살표 함수 등을 정리합니다.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=6" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 10. 28</div>
+                        <h3 class="card-title">Github Actions로 CI/CD 구축</h3>
+                        <p class="card-excerpt">자동화된 배포 파이프라인을 구축하여 개발 생산성을 높이는 방법을 단계별로 알아봅니다.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=7" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 10. 12</div>
+                        <h3 class="card-title">TypeScript, 왜 써야 할까?</h3>
+                        <p class="card-excerpt">정적 타이핑의 장점과 도입 시 고려해야 할 점, 그리고 마이그레이션 전략에 대해 이야기합니다.</p>
+                    </div>
+                </article>
+                 <article class="card">
+                    <img src="https://picsum.photos/400/250?random=8" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 09. 30</div>
+                        <h3 class="card-title">웹 성능 최적화 가이드</h3>
+                        <p class="card-excerpt">Lighthouse 점수를 높이고 사용자 경험을 개선하기 위한 이미지 최적화 및 코드 스플리팅 기법.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=9" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 09. 15</div>
+                        <h3 class="card-title">Serverless 아키텍처의 이해</h3>
+                        <p class="card-excerpt">AWS Lambda와 Firebase Functions를 활용하여 서버 관리 부담 없이 백엔드 로직을 구현합니다.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=10" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 09. 01</div>
+                        <h3 class="card-title">웹 보안 기초: XSS와 CSRF</h3>
+                        <p class="card-excerpt">프론트엔드 개발자가 반드시 알아야 할 웹 애플리케이션 보안 취약점과 방어 방법을 소개합니다.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 3. DESIGN Section -->
+        <section id="design">
+            <div class="section-header">
+                <h2 class="section-title">Design Ideas</h2>
+                <p style="color:var(--text-secondary)">UI/UX, 영감, 그리고 크리에이티브한 생각들</p>
+            </div>
+            <div class="post-grid">
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=11" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 11. 05</div>
+                        <h3 class="card-title">Bento Grid 레이아웃 트렌드</h3>
+                        <p class="card-excerpt">애플이 주도하고 있는 도시락통(Bento) 스타일의 그리드 레이아웃이 왜 유행하는지 분석합니다.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=12" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 10. 22</div>
+                        <h3 class="card-title">가독성을 높이는 폰트 페어링</h3>
+                        <p class="card-excerpt">제목용 서체와 본문용 서체의 조화로운 조합을 찾는 방법과 추천 무료 폰트 리스트.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <img src="https://picsum.photos/400/250?random=13" class="card-image">
+                    <div class="card-body">
+                        <div class="card-date">2023. 10. 05</div>
+                        <h3 class="card-title">2024 올해의 컬러와 웹 디자인</h3>
+                        <p class="card-excerpt">팬톤이 선정한 컬러를 웹사이트에 효과적으로 적용하는 방법과 팔레트 구성 팁.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 4. ABOUT Section -->
+        <section id="about">
+            <div class="about-container">
+                <img src="https://picsum.photos/150/150?random=20" alt="Anne Profile" class="profile-img">
+                <h2 class="section-title">Hello, I'm Anne.</h2>
+                <p style="color:var(--text-secondary); margin-top:1rem; font-size:1.1rem;">
+                    Frontend Developer & UI Designer
+                </p>
+                <div style="margin-top: 2rem; line-height: 1.8; color: var(--text-color);">
+                    <p>안녕하세요! 웹 기술로 아이디어를 실현하는 것을 좋아하는 개발자 앤입니다.</p>
+                    <p>사용자 경험을 최우선으로 생각하며, 깔끔하고 직관적인 인터페이스를 만듭니다.</p>
+                    <p>새로운 기술을 배우고 기록하는 것을 즐깁니다.</p>
+                </div>
+
+                <div class="about-links">
+                    <a href="https://github.com/Anne87" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="mailto:ppooppsy@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 푸터 -->
+    <footer>
+        <p>&copy; 2024 Anne's Blog. All rights reserved.</p>
+        <div style="margin-top: 10px;">
+            <a href="https://github.com/Anne87" target="_blank" style="margin: 0 10px;">Github</a>
+            <a href="mailto:ppooppsy@gmail.com" style="margin: 0 10px;">Contact</a>
+        </div>
+    </footer>
+
+    <!-- 
+      [SCRIPT.JS 영역]
+      별도의 파일로 분리 시 script.js에 해당합니다.
+    -->
+    <script>
+        // DOM 요소 선택
+        const navLinks = document.getElementById('navLinks');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('section');
+
+        // 1. SPA 내비게이션 기능 (페이지 전환 없이 섹션 변경)
+        function navigateTo(sectionId) {
+            // 모든 섹션 숨기기 및 클래스 제거
+            sections.forEach(sec => sec.classList.remove('active'));
+            navItems.forEach(item => item.classList.remove('active'));
+
+            // 선택된 섹션 및 메뉴 활성화
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // 상단 메뉴 활성화 상태 변경
+            navItems.forEach(item => {
+                if (item.getAttribute('onclick').includes(sectionId)) {
+                    item.classList.add('active');
+                }
+            });
+
+            // 모바일 메뉴 열려있으면 닫기
+            if (window.innerWidth <= 600) {
+                navLinks.classList.remove('active');
+            }
+
+            // 화면 최상단으로 스크롤
+            window.scrollTo(0, 0);
+        }
+
+        // 2. 모바일 메뉴 토글
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // 3. 다크 모드 / 라이트 모드 전환
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const icon = themeToggle.querySelector('i');
+
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // 초기 로드 시 테마 설정 확인
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const icon = themeToggle.querySelector('i');
+            
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        });
+    </script>
+</body>
+</html>
